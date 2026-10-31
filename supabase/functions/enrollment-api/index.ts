@@ -84,7 +84,7 @@ Deno.serve(async(req:Request)=>{
      const {error:ce}=await admin.from("emergency_contacts").insert({student_id:student.id,full_name:emergencyName,relationship:emergencyRelation,phone:emergencyPhone});
      let ge=null;
      if(minor){const parts=guardianName!.split(/\s+/);const {error}=await admin.from("guardians").insert({student_id:student.id,auth_user_id:user.id,first_name:parts[0],last_name:parts.slice(1).join(" ")||parts[0],relationship:guardianRelation,email:guardianEmail,phone:guardianPhone,is_legal_guardian:true});ge=error;}
-     if(ee||ce||ge)return respond(500,{error:"Student draft created but related records need reconciliation",student_id:student.id});
+     if(ee||ce||ge)return respond(500,{error:"Student draft created but related records need reconciliation",student_id:student.id},origin);
      return respond(201,{status:"draft",student_id:student.id,waiver_archived:false,payment_processed:false},origin);
    }
    return respond(404,{error:"Not found"},origin);
