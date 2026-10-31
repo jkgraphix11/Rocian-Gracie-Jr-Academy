@@ -1,39 +1,46 @@
-// Protected enrollment API foundation. Not connected to the public website.
-// Supabase JWT validation is enabled on this function; user identity is checked again with Auth.
+// First protected account endpoint; student and waiver submissions remain disabled.
 import { createClient } from "npm:@supabase/supabase-js@2.58.0";
-const json=(status:number,data:unknown)=>new Response(JSON.stringify(data),{status,headers:{"content-type":"application/json","cache-control":"no-store"}});
+const allowedOrigins = new Set([
+  "https://jkgraphix11.github.io",
+  "https://rocian-gracie-tijuana.jkgraphix11.chatgpt.site"
+]);
+const headers=(origin:string|null):Record<string,string>=>({
+ "content-type":"application/json","cache-control":"no-store","vary":"Origin",
+ ...(origin&&allowedOrigins.has(origin)?{"access-control-allow-origin":origin,"access-control-allow-headers":"authorization, apikey, content-type, x-client-info","access-control-allow-methods":"GET, POST, OPTIONS"}:{})
+});
+const respond=(status:number,body:unknown,origin:string|null)=>new Response(JSON.stringify(body),{status,headers:headers(origin)});
 Deno.serve(async(req:Request)=>{
-  try {
-    const token=req.headers.get("authorization")?.match(/^Bearer (.+)$/)?.[1];
-    if(!token) return json(401,{error:"Authentication required"});
-    const url=Deno.env.get("SUPABASE_URL");
-    const key=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-    if(!url||!key) return json(503,{error:"Backend is not configured"});
-    const admin=createClient(url,key,{auth:{autoRefreshToken:false,persistSession:false}});
-    const {data:{user},error}=await admin.auth.getUser(token);
-    if(error||!user||!user.email_confirmed_at) return json(401,{error:"Verified account required"});
-    const path=new URL(req.url).pathname.replace(/\/$/,"");
-    if(req.method==="GET" && path.endsWith("/me")){
-      const {data,error:dbError}=await admin.from("accounts").select("id,display_name,verified_email,created_at").eq("id",user.id).maybeSingle();
-      if(dbError) return json(500,{error:"Could not read account"});
-      return json(200,{account:data});
-    }
-    if(req.method==="POST" && path.endsWith("/accounts")){
-      const origin=req.headers.get("origin");
-      const allowed=(Deno.env.get("APP_ORIGIN")||"").split(",").map(x=>x.trim()).filter(Boolean);
-      if(!origin||!allowed.includes(origin)) return json(403,{error:"Origin not allowed"});
-      if((req.headers.get("content-type")||"").split(";")[0]!=="application/json") return json(415,{error:"JSON required"});
-      if(Number(req.headers.get("content-length")||"0")>4096) return json(413,{error:"Request too large"});
-      const body=await req.json().catch(()=>null);
-      if(!body||typeof body.display_name!=="string")return json(400,{error:"Display name required"});
-      const name=body.display_name.trim();
-      if(name.length<2||name.length>120)return json(400,{error:"Invalid display name"});
-      const {data,error:dbError}=await admin.from("accounts")
-        .upsert({id:user.id,display_name:name,verified_email:user.email!},{onConflict:"id"})
-        .select("id,display_name,verified_email,created_at").single();
-      if(dbError)return json(500,{error:"Could not save account"});
-      return json(200,{account:data});
-    }
-    return json(404,{error:"Route not found"});
-  } catch {return json(400,{error:"Invalid request"});}
+ const origin=req.headers.get("origin");
+ if(req.method==="OPTIONS"){
+   if(!origin||!allowedOrigins.has(origin)) return new Response(null,{status:403});
+   return new Response(null,{status:204,headers:headers(origin)});
+ }
+ if(origin&&!allowedOrigins.has(origin))return respond(403,{error:"Origin not allowed"},origin);
+ try{
+   const token=req.headers.get("authorization")?.match(/^Bearer (.+)$/)?.[1];
+   if(!token)return respond(401,{error:"Authentication required"},origin);
+   const url=Deno.env.get("SUPABASE_URL"),key=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+   if(!url||!key)return respond(503,{error:"Backend not configured"},origin);
+   const admin=createClient(url,key,{auth:{autoRefreshToken:false,persistSession:false}});
+   const {data:{user},error}=await admin.auth.getUser(token);
+   if(error||!user||!user.email||!user.email_confirmed_at)return respond(401,{error:"Verified email required"},origin);
+   const path=new URL(req.url).pathname.replace(/\/$/,"");
+   if(req.method==="GET"&&path.endsWith("/me")){
+     const {data,error:e}=await admin.from("accounts").select("id,display_name,verified_email,created_at").eq("id",user.id).maybeSingle();
+     return e?respond(500,{error:"Database error"},origin):respond(200,{account:data},origin);
+   }
+   if(req.method==="POST"&&path.endsWith("/accounts")){
+     if(!origin||!allowedOrigins.has(origin))return respond(403,{error:"Browser origin required"},origin);
+     if(req.headers.get("content-type")?.split(";")[0]!=="application/json")return respond(415,{error:"JSON required"},origin);
+     const raw=await req.text();
+     if(raw.length>4096)return respond(413,{error:"Too large"},origin);
+     let body;try{body=JSON.parse(raw)}catch{return respond(400,{error:"Invalid JSON"},origin)}
+     if(!body||typeof body.display_name!=="string")return respond(400,{error:"Display name required"},origin);
+     const name=body.display_name.trim().replace(/\s+/g," ");
+     if(name.length<2||name.length>120)return respond(400,{error:"Invalid name"},origin);
+     const {data,error:e}=await admin.from("accounts").upsert({id:user.id,display_name:name,verified_email:user.email},{onConflict:"id"}).select("id,display_name,verified_email,created_at").single();
+     return e?respond(500,{error:"Database error"},origin):respond(200,{account:data},origin);
+   }
+   return respond(404,{error:"Not found"},origin);
+ }catch{return respond(400,{error:"Invalid request"},origin)}
 });
