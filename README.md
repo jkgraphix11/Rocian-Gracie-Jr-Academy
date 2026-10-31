@@ -26,7 +26,11 @@ The compiled stylesheet is committed. For CSS changes, update both `src/theme.cs
 
 ## Staging
 
-This repository stores the editable source, deployable `dist/` assets, checks, and backend design. GitHub Pages or another staging host is not configured yet. Existing demo: https://rocian-gracie-tijuana.jkgraphix11.chatgpt.site
+GitHub Pages is the staging host. The workflow in `.github/workflows/pages.yml` builds, checks, and deploys on pushes to `main` or manual dispatch. One-time repository setup: Settings → Pages → Build and deployment → Source → GitHub Actions. After enabling Pages, rerun the workflow if its first run failed.
+
+Expected staging URL after successful deployment: https://jkgraphix11.github.io/Rocian-Gracie-Jr-Academy/
+
+`src/github_pages.py` prepares paths for the repository subdirectory and adds noindex metadata to staging pages. The deployment artifact is `_site/`; do not commit this generated folder.
 
 ## Enrollment status
 
