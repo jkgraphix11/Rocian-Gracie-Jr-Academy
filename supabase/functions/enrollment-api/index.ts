@@ -75,17 +75,21 @@ Deno.serve(async(req:Request)=>{
        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(guardianEmail)||!/^\+\d{10,15}$/.test(guardianPhone)||
        guardianEmail.toLowerCase()!==user.email.toLowerCase()))
        return respond(400,{error:"Verified guardian details required"},origin);
-     // A draft is not a signed waiver, active membership, or academy-approved registration.
-     const {data:acct,error:ae}=await admin.from("accounts").upsert({id:user.id,display_name:minor?guardianName!:first+" "+last,verified_email:user.email},{onConflict:"id"}).select("id").single();
-     if(ae||!acct)return respond(500,{error:"Could not prepare account"},origin);
-     const {data:student,error:se}=await admin.from("students").insert({account_id:user.id,first_name:first,last_name:last,date_of_birth:dob,email,phone,preferred_language:language,status:"pending"}).select("id").single();
-     if(se||!student)return respond(500,{error:"Could not create student draft"},origin);
-     const {error:ee}=await admin.from("enrollments").insert({student_id:student.id,account_id:user.id,enrollment_type:plan==="intro"?"intro":"membership",status:"started"});
-     const {error:ce}=await admin.from("emergency_contacts").insert({student_id:student.id,full_name:emergencyName,relationship:emergencyRelation,phone:emergencyPhone});
-     let ge=null;
-     if(minor){const parts=guardianName!.split(/\s+/);const {error}=await admin.from("guardians").insert({student_id:student.id,auth_user_id:user.id,first_name:parts[0],last_name:parts.slice(1).join(" ")||parts[0],relationship:guardianRelation,email:guardianEmail,phone:guardianPhone,is_legal_guardian:true});ge=error;}
-     if(ee||ce||ge)return respond(500,{error:"Student draft created but related records need reconciliation",student_id:student.id},origin);
-     return respond(201,{status:"draft",student_id:student.id,waiver_archived:false,payment_processed:false},origin);
+     // The database function creates all related records in a single transaction.
+     const key=typeof b.idempotencyKey==="string"&&/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(b.idempotencyKey)?b.idempotencyKey:null;
+     if(!key)return respond(400,{error:"Valid idempotency key required"},origin);
+     const {data:created,error:writeError}=await admin.rpc("create_enrollment_draft",{
+       p_account_id:user.id,p_key:key,p_data:{
+         account_name:minor?guardianName:first+" "+last,
+         first_name:first,last_name:last,dob,email,phone,language,
+         plan:plan==="intro"?"intro":"membership",minor,
+         emergency_name:emergencyName,emergency_relation:emergencyRelation,emergency_phone:emergencyPhone,
+         guardian_name:minor?guardianName:null,guardian_relation:minor?guardianRelation:null,
+         guardian_email:minor?guardianEmail:null,guardian_phone:minor?guardianPhone:null
+       }
+     });
+     if(writeError)return respond(500,{error:"Could not save enrollment draft"},origin);
+     return respond(created?.reused?200:201,{status:"draft",student_id:created.student_id,enrollment_id:created.enrollment_id,reused:created.reused,waiver_archived:false,payment_processed:false},origin);
    }
    return respond(404,{error:"Not found"},origin);
  }catch{return respond(400,{error:"Invalid request"},origin)}
