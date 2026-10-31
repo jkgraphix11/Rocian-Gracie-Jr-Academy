@@ -31,8 +31,12 @@ assert.equal(phoneNumber('US','+1 (619) 555-0123'),'+16195550123');
 assert.equal(phoneNumber('MX','+52 '),'');
 
 const {cleanPhoneInput}=sandbox.window.RGJEnrollment;
-assert.equal(cleanPhoneInput('US','+1 (619) 555-0123'),'+1 6195550123');
-assert.equal(cleanPhoneInput('MX','+52 abc664-123.4567'),'+52 6641234567');
-assert.equal(cleanPhoneInput('MX','abc'),'+52 ');
-assert.equal(cleanPhoneInput('MX','664123456789'),'+52 6641234567');
-assert.equal(cleanPhoneInput('US','6195550123'),'+1 6195550123');
+assert.equal(cleanPhoneInput('US','+1 (619) 555-0123'),'6195550123');
+assert.equal(cleanPhoneInput('MX','+52 abc664-123.4567'),'6641234567');
+assert.equal(cleanPhoneInput('MX','abc'),'');
+assert.equal(cleanPhoneInput('MX','664123456789'),'6641234567');
+assert.equal(cleanPhoneInput('US','6195550123'),'6195550123');
+
+assert.equal(cleanPhoneInput('US','16195550123'),'6195550123');
+assert.equal(phoneNumber('US',cleanPhoneInput('US','6195550123')),'+16195550123');
+assert.equal(phoneNumber('MX',cleanPhoneInput('MX','6641234567')),'+526641234567');

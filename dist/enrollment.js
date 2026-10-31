@@ -12,9 +12,11 @@ window.RGJEnrollment = (() => {
   return digits.length===10?phoneCode(country)+digits:'';
  };
  const cleanPhoneInput=(country,value)=>{
-  const prefix=phoneCode(country);
-  const local=String(value).trim().replace(/^\+(?:52|1)\s*/, '');
-  return prefix+' '+local.replace(/[^0-9]/g,'').slice(0,10);
+   const local=String(value).trim().replace(/^\+(?:52|1)\s*/, '');
+  let digits=local.replace(/[^0-9]/g,'');
+  if(country==='US'&&digits.length===11&&digits.startsWith('1'))digits=digits.slice(1);
+  if(country==='MX'&&digits.length===12&&digits.startsWith('52'))digits=digits.slice(2);
+  return digits.slice(0,10);
  };
  function init(){
  const root=document.getElementById('enrollment-app');if(!root)return;
@@ -24,7 +26,7 @@ window.RGJEnrollment = (() => {
  let dropdownEvents=new AbortController();
  const t=(en,es)=>lang==='en'?en:es;
  const minor=()=>Number.isFinite(age(data.dob))&&age(data.dob)>=0&&age(data.dob)<18;
- const steps=()=>t(['Your path','Student','Contacts','Waiver','Review','Done'],['Tu camino','Alumno','Contactos','Responsiva','Revisión','Listo']);
+ const steps=()=>t(['Your path','Student','Emergency Contact','Waiver','Review','Done'],['Tu camino','Alumno','Contacto de emergencia','Responsiva','Revisión','Listo']);
  const planName=()=>waiverOnly?t('Student waiver','Carta responsiva'):data.plan==='intro'?t('3 free trial classes','3 clases de prueba gratis'):t('Monthly membership','Membresía mensual');
  const signer=()=>minor()?data.guardianName:[data.firstName,data.lastName].filter(Boolean).join(' ');
  const hint=key=>({dob:t('For students under 18, guardian details appear below.','Para alumnos menores de 18 años, aparecerán los datos del tutor.'),guardianDob:t('The signer must be at least 18 years old.','Quien firma debe tener al menos 18 años.'),program:t('Choose a class or explore with 3 free classes.','Elige una clase o conoce la academia con 3 clases gratis.'),signature:t('Use the full legal name shown above.','Usa el nombre legal completo mostrado arriba.'),participantSignature:t('Use the student’s full name.','Usa el nombre completo del alumno.'),guardianRelation:t('For example: mother, father or legal guardian.','Por ejemplo: madre, padre o tutor legal.'),emergencyRelation:t('For example: parent, partner or friend.','Por ejemplo: madre, pareja o amigo.')})[key]||(key.toLowerCase().includes('phone')?t('Select Mexico or USA, then enter 10 digits. The country code is added automatically.','Selecciona México o EE. UU. e ingresa 10 dígitos. El código de país se agrega automáticamente.'):key.toLowerCase().includes('email')?t('Use an email where we can reach you.','Usa un correo donde podamos contactarte.'):t('Enter the full legal name.','Ingresa el nombre legal completo.'));
@@ -32,7 +34,7 @@ window.RGJEnrollment = (() => {
  const wrapField=(key,label,control)=>`<div class="enroll-field"><label for="field-${key}">${label} <span class="field-required" aria-hidden="true">*</span></label><div class="field-control">${control}${errorIcon}</div><p class="field-hint" id="hint-${key}">${hint(key)}</p><p class="field-error" id="error-${key}" hidden></p></div>`;
  const phoneField=(key,label)=>{
  const country=data[key+'Country']||'MX';
- return wrapField(key,label,`<div class="phone-input"><select class="phone-country" name="${key}Country" aria-label="${escape(label)} — ${t('Country','País')}"><option value="MX" ${country==='MX'?'selected':''}>MX</option><option value="US" ${country==='US'?'selected':''}>US</option></select><input id="field-${key}" name="${key}" type="tel" inputmode="numeric" autocomplete="tel" required maxlength="25" value="${escape(data[key+'Display']??(phoneCode(country)+' '))}" placeholder="${country==='MX'?'+52 664 123 4567':'+1 (555) 000-0000'}" aria-describedby="hint-${key}"></div>`);
+ return wrapField(key,label,`<div class="phone-input"><select class="phone-country" name="${key}Country" aria-label="${escape(label)} — ${t('Country','País')}"><option value="MX" ${country==='MX'?'selected':''}>MX</option><option value="US" ${country==='US'?'selected':''}>US</option></select><span class="phone-prefix" id="prefix-${key}">${phoneCode(country)}</span><input id="field-${key}" name="${key}" type="tel" inputmode="numeric" autocomplete="tel-national" required maxlength="25" value="${escape(cleanPhoneInput(country,data[key+'Display']||''))}" placeholder="${country==='MX'?'6641234567':'6195550123'}" aria-describedby="prefix-${key} hint-${key}"></div>`);
  };
  const field=(key,label,type='text',extra='')=>type==='tel'?phoneField(key,label):wrapField(key,label,`<input id="field-${key}" name="${key}" type="${type}" value="${escape(data[key])}" required maxlength="160" aria-describedby="hint-${key}" ${type==='email'?'placeholder="you@example.com"':type==='tel'?'placeholder="+52 664 123 4567"':''} ${extra}>`);
  const check=(key,label)=>`<div class="enroll-field enroll-check-field"><label class="enroll-check"><input type="checkbox" name="${key}" required ${data[key]?'checked':''}><span>${label}</span></label><p class="field-error" id="error-${key}" hidden></p></div>`;
@@ -60,9 +62,9 @@ window.RGJEnrollment = (() => {
   const country=form.elements[input.name+'Country'].value;
   const original=input.value,position=input.selectionStart;
   const cleaned=cleanPhoneInput(country,original);
-  if(original!==cleaned){input.value=cleaned;const caret=Math.max(phoneCode(country).length+1,Math.min(cleaned.length,position-(original.length-cleaned.length)));input.setSelectionRange(caret,caret);}
+  if(original!==cleaned){input.value=cleaned;const caret=Math.max(0,Math.min(cleaned.length,position-(original.length-cleaned.length)));input.setSelectionRange(caret,caret);}
  });
- form.addEventListener('change',e=>{if(!e.target.matches('.phone-country'))return;const key=e.target.name.replace(/Country$/,'');const input=form.elements[key];const national=input.value.trim().replace(/^\+(?:52|1)\s*/, '');input.value=phoneCode(e.target.value)+' '+national;input.placeholder=e.target.value==='MX'?'+52 664 123 4567':'+1 (555) 000-0000';capture();if(input.getAttribute('aria-invalid')==='true')validateField(input);});
+ form.addEventListener('change',e=>{if(!e.target.matches('.phone-country'))return;const key=e.target.name.replace(/Country$/,'');const input=form.elements[key];root.querySelector('#prefix-'+key).textContent=phoneCode(e.target.value);input.placeholder=e.target.value==='MX'?'6641234567':'6195550123';capture();if(input.getAttribute('aria-invalid')==='true')validateField(input);});
  form.addEventListener('focusout',e=>{if(e.target.matches('input[required],select[required]')){capture();validateField(e.target);}});
  const correct=e=>{if(!e.target.matches('input[required],select[required]'))return;capture();if(e.target.getAttribute('aria-invalid')==='true')validateField(e.target);if(e.target.name==='dob'){const program=form.querySelector('[name=program]');if(program?.getAttribute('aria-invalid')==='true')validateField(program);}if(!form.querySelector('[aria-invalid="true"]'))root.querySelector('#enroll-error').hidden=true;};
  form.addEventListener('input',correct);form.addEventListener('change',correct);
@@ -114,7 +116,7 @@ window.RGJEnrollment = (() => {
  if(el.type==='checkbox')return el.checked?'':t('Please confirm this acknowledgement.','Confirma esta declaración.');
  if(!value)return t('This field is required.','Este campo es obligatorio.');
  if(el.type==='email'&&el.validity.typeMismatch)return t('Enter a valid email, e.g. you@example.com.','Ingresa un correo válido, p. ej. nombre@ejemplo.com.');
- if(el.type==='tel'&&!phoneNumber(data[key+'Country']||'MX',value))return t('Enter the selected country code followed by a 10-digit phone number.','Ingresa el código del país seleccionado seguido de un teléfono de 10 dígitos.');
+ if(el.type==='tel'&&!phoneNumber(data[key+'Country']||'MX',value))return t('Enter your 10-digit phone number without the country code.','Ingresa tu teléfono de 10 dígitos sin el código de país.');
  if(el.type==='date'&&(!Number.isFinite(age(value))||age(value)>120||el.validity.rangeUnderflow||el.validity.rangeOverflow))return t('Enter a valid date of birth in the past.','Ingresa una fecha de nacimiento válida en el pasado.');
  if(key==='guardianDob'&&age(value)<18)return t('The parent or guardian must be at least 18.','El padre, madre o tutor debe tener al menos 18 años.');
  if(key==='program'&&(value.startsWith('kids')||value==='toddlers')&&!minor())return t('Choose an adult class or 3 free classes.','Elige una clase para adultos o 3 clases gratis.');
