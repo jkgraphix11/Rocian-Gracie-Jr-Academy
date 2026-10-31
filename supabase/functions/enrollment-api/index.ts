@@ -56,12 +56,12 @@ Deno.serve(async(req:Request)=>{
      const interests=b.interests;
      const permittedInterests=new Set(["jiujitsu","judo","kickboxing","boxing","selfdefense","yoga","explore"]);
      if(!first||!last||!email||!phone||!emergencyName||!emergencyRelation||!emergencyPhone||!dob||
-       !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)||!/^\\+\\d{10,15}$/.test(phone)||!/^\\+\\d{10,15}$/.test(emergencyPhone)||
+       !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)||!/^\+\d{10,15}$/.test(phone)||!/^\+\d{10,15}$/.test(emergencyPhone)||
        !["intro","monthly"].includes(String(plan))||!["en","es"].includes(String(language))||
        !Array.isArray(interests)||!interests.length||interests.length>7||interests.some((x:unknown)=>!permittedInterests.has(String(x))))
        return respond(400,{error:"Invalid enrollment details"},origin);
      if(user.email.toLowerCase()!==email.toLowerCase())return respond(403,{error:"Contact email must match verified account"},origin);
-     const m=/^(\\d{4})-(\\d{2})-(\\d{2})$/.exec(dob);
+     const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(dob);
      if(!m)return respond(400,{error:"Invalid birth date"},origin);
      const yy=Number(m[1]),mm=Number(m[2]),dd=Number(m[3]),date=new Date(Date.UTC(yy,mm-1,dd));
      if(date.getUTCFullYear()!==yy||date.getUTCMonth()!==mm-1||date.getUTCDate()!==dd)return respond(400,{error:"Invalid birth date"},origin);
@@ -72,7 +72,7 @@ Deno.serve(async(req:Request)=>{
      const minor=years<18;
      const guardianName=s(b.guardianName),guardianRelation=s(b.guardianRelation),guardianEmail=s(b.guardianEmail,254),guardianPhone=s(b.guardianPhone,25);
      if(minor&&(!guardianName||!guardianRelation||!guardianEmail||!guardianPhone||
-       !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(guardianEmail)||!/^\\+\\d{10,15}$/.test(guardianPhone)||
+       !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(guardianEmail)||!/^\+\d{10,15}$/.test(guardianPhone)||
        guardianEmail.toLowerCase()!==user.email.toLowerCase()))
        return respond(400,{error:"Verified guardian details required"},origin);
      // A draft is not a signed waiver, active membership, or academy-approved registration.
@@ -83,7 +83,7 @@ Deno.serve(async(req:Request)=>{
      const {error:ee}=await admin.from("enrollments").insert({student_id:student.id,account_id:user.id,enrollment_type:plan==="intro"?"intro":"membership",status:"started"});
      const {error:ce}=await admin.from("emergency_contacts").insert({student_id:student.id,full_name:emergencyName,relationship:emergencyRelation,phone:emergencyPhone});
      let ge=null;
-     if(minor){const parts=guardianName!.split(/\\s+/);const {error}=await admin.from("guardians").insert({student_id:student.id,auth_user_id:user.id,first_name:parts[0],last_name:parts.slice(1).join(" ")||parts[0],relationship:guardianRelation,email:guardianEmail,phone:guardianPhone,is_legal_guardian:true});ge=error;}
+     if(minor){const parts=guardianName!.split(/\s+/);const {error}=await admin.from("guardians").insert({student_id:student.id,auth_user_id:user.id,first_name:parts[0],last_name:parts.slice(1).join(" ")||parts[0],relationship:guardianRelation,email:guardianEmail,phone:guardianPhone,is_legal_guardian:true});ge=error;}
      if(ee||ce||ge)return respond(500,{error:"Student draft created but related records need reconciliation",student_id:student.id});
      return respond(201,{status:"draft",student_id:student.id,waiver_archived:false,payment_processed:false},origin);
    }
