@@ -40,3 +40,17 @@ assert.equal(cleanPhoneInput('US','6195550123'),'6195550123');
 assert.equal(cleanPhoneInput('US','16195550123'),'6195550123');
 assert.equal(phoneNumber('US',cleanPhoneInput('US','6195550123')),'+16195550123');
 assert.equal(phoneNumber('MX',cleanPhoneInput('MX','6641234567')),'+526641234567');
+
+vm.runInNewContext(fs.readFileSync('dist/waiver-content.js','utf8'),sandbox);
+const waiver=sandbox.window.RGJ_WAIVER;
+const crypto=require('node:crypto');
+for(const lang of ['en','es']){
+ assert.equal(waiver[lang].length,14);
+ assert(!JSON.stringify(waiver[lang]).includes('___'));
+ assert.equal(crypto.createHash('sha256').update(JSON.stringify(waiver[lang])).digest('hex'),waiver.textSha256ByLanguage[lang]);
+}
+assert.notEqual(waiver.textSha256ByLanguage.en,waiver.textSha256ByLanguage.es);
+assert(script.includes('language:lang,interfaceLanguage:lang'));
+const waiverStep=script.split('if(step===3)return')[1].split('if(step===4)return')[0];
+assert.equal((waiverStep.match(/\$\{check\(/g)||[]).length,2);
+console.log('PASS: two acknowledgements, bilingual waiver bodies, no paper blanks, and language-specific evidence hashes.');
