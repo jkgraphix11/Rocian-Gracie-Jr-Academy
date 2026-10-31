@@ -18,10 +18,11 @@ Requires Python 3.12+ and Node.js.
 
 ```sh
 python src/build.py
+python src/standalone.py
 npm run check
 ```
 
-The compiled stylesheet is committed. For CSS changes, update both `src/theme.css` and `dist/style.css`, or install the pinned dependencies and rebuild Tailwind. Optional: `python src/standalone.py` generates the portable single-file demo.
+The compiled stylesheet is committed. For CSS changes, update both `src/theme.css` and `dist/style.css`, or install the pinned dependencies and rebuild Tailwind. The standalone build creates the portable single-file demo used by the checks.
 
 ## Staging
 

@@ -1,0 +1,12 @@
+{
+  "name": "rocian-tijuana",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "build": "python src/build.py && tailwindcss -c tailwind.config.cjs -i src/theme.css -o dist/style.css --minify && python src/standalone.py",
+    "check": "python src/check.py && node --check dist/script.js && node --check dist/enrollment.js && node tests/enrollment.cjs && node tests/pricing.cjs"
+  },
+  "devDependencies": {
+    "tailwindcss": "3.4.17"
+  }
+}

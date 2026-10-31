@@ -1,0 +1,13 @@
+{
+  "memberships": {
+    "enabled": false,
+    "plans": [],
+    "portalUrl": ""
+  },
+  "waivers": {
+    "enabled": false,
+    "approvedVersion": "",
+    "adult": {"es": "", "en": ""},
+    "minor": {"es": "", "en": ""}
+  }
+}
