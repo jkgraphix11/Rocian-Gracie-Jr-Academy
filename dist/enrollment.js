@@ -78,6 +78,8 @@ window.RGJEnrollment = (() => {
  dobField?.addEventListener('input',updateGuardian);dobField?.addEventListener('change',updateGuardian);
  root.querySelectorAll('[name=interest]').forEach(input=>input.addEventListener('change',()=>{capture();const notice=root.querySelector('#interest-error');if(data.interests.length)notice.hidden=true;}));
 
+ root.querySelector('[data-otp-send]')?.addEventListener('click',async()=>{if(otpBusy)return;otpBusy=true;otpError='';try{await window.RGJAuth.requestCode(data.email);otpSent=true;}catch(e){otpError=t('Unable to send code. Try again later.','No se pudo enviar el código. Inténtalo más tarde.');}finally{otpBusy=false;render();}});
+ root.querySelector('[data-otp-check]')?.addEventListener('click',async()=>{if(otpBusy)return;const code=root.querySelector('#otp-code')?.value||'';otpBusy=true;otpError='';try{const account=await window.RGJAuth.verifyCode(data.email,code);emailVerified=account.email.toLowerCase();}catch(e){otpError=t('Invalid or expired code. Request another.','Código incorrecto o vencido. Solicita otro.');}finally{otpBusy=false;render();}});
  root.querySelector('[data-back]')?.addEventListener('click',()=>{capture();if(step===4)invalidate();step=flow[flow.indexOf(step)-1];render(true);});
  root.querySelector('[data-edit]')?.addEventListener('click',()=>{invalidate();step=1;render(true);});
  root.querySelector('[data-reset]')?.addEventListener('click',()=>{data={plan:'intro'};signed=null;emailVerified=null;otpSent=false;window.RGJAuth?.signOut();step=flow[0];render(true);});
