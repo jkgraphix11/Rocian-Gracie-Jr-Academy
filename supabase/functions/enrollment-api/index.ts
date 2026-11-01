@@ -41,6 +41,56 @@ Deno.serve(async(req:Request)=>{
      const {data,error:e}=await admin.from("accounts").upsert({id:user.id,display_name:name,verified_email:user.email},{onConflict:"id"}).select("id,display_name,verified_email,created_at").single();
      return e?respond(500,{error:"Database error"},origin):respond(200,{account:data},origin);
    }
+
+   if(req.method==="POST"&&path.endsWith("/enrollments")){
+     if(!origin||!allowedOrigins.has(origin))return respond(403,{error:"Browser origin required"},origin);
+     if(req.headers.get("content-type")?.split(";")[0]!=="application/json")return respond(415,{error:"JSON required"},origin);
+     const raw=await req.text();
+     if(raw.length>8192)return respond(413,{error:"Request too large"},origin);
+     let b:Record<string,unknown>;try{b=JSON.parse(raw)}catch{return respond(400,{error:"Invalid JSON"},origin)}
+     if(!b||Array.isArray(b)||typeof b!=="object")return respond(400,{error:"Invalid input"},origin);
+     const s=(v:unknown,n=120)=>typeof v==="string"&&v.trim().length>0&&v.trim().length<=n?v.trim():null;
+     const first=s(b.firstName),last=s(b.lastName),email=s(b.email,254),phone=s(b.phone,25);
+     const emergencyName=s(b.emergencyName),emergencyRelation=s(b.emergencyRelation),emergencyPhone=s(b.emergencyPhone,25);
+     const dob=s(b.dob,10),plan=b.plan,language=b.language;
+     const interests=b.interests;
+     const permittedInterests=new Set(["jiujitsu","judo","kickboxing","boxing","selfdefense","yoga","explore"]);
+     if(!first||!last||!email||!phone||!emergencyName||!emergencyRelation||!emergencyPhone||!dob||
+       !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)||!/^\+\d{10,15}$/.test(phone)||!/^\+\d{10,15}$/.test(emergencyPhone)||
+       !["intro","monthly"].includes(String(plan))||!["en","es"].includes(String(language))||
+       !Array.isArray(interests)||!interests.length||interests.length>7||interests.some((x:unknown)=>!permittedInterests.has(String(x))))
+       return respond(400,{error:"Invalid enrollment details"},origin);
+     if(user.email.toLowerCase()!==email.toLowerCase())return respond(403,{error:"Contact email must match verified account"},origin);
+     const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(dob);
+     if(!m)return respond(400,{error:"Invalid birth date"},origin);
+     const yy=Number(m[1]),mm=Number(m[2]),dd=Number(m[3]),date=new Date(Date.UTC(yy,mm-1,dd));
+     if(date.getUTCFullYear()!==yy||date.getUTCMonth()!==mm-1||date.getUTCDate()!==dd)return respond(400,{error:"Invalid birth date"},origin);
+     const today=new Intl.DateTimeFormat("en-CA",{timeZone:"America/Tijuana",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
+     const [ty,tm,td]=today.split("-").map(Number);
+     const years=ty-yy-(tm<mm||(tm===mm&&td<dd)?1:0);
+     if(dob>today||years<0||years>110)return respond(400,{error:"Invalid birth date"},origin);
+     const minor=years<18;
+     const guardianName=s(b.guardianName),guardianRelation=s(b.guardianRelation),guardianEmail=s(b.guardianEmail,254),guardianPhone=s(b.guardianPhone,25);
+     if(minor&&(!guardianName||!guardianRelation||!guardianEmail||!guardianPhone||
+       !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(guardianEmail)||!/^\+\d{10,15}$/.test(guardianPhone)||
+       guardianEmail.toLowerCase()!==user.email.toLowerCase()))
+       return respond(400,{error:"Verified guardian details required"},origin);
+     // The database function creates all related records in a single transaction.
+     const key=typeof b.idempotencyKey==="string"&&/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(b.idempotencyKey)?b.idempotencyKey:null;
+     if(!key)return respond(400,{error:"Valid idempotency key required"},origin);
+     const {data:created,error:writeError}=await admin.rpc("create_enrollment_draft",{
+       p_account_id:user.id,p_key:key,p_data:{
+         account_name:minor?guardianName:first+" "+last,
+         first_name:first,last_name:last,dob,email,phone,language,
+         plan:plan==="intro"?"intro":"membership",minor,
+         emergency_name:emergencyName,emergency_relation:emergencyRelation,emergency_phone:emergencyPhone,
+         guardian_name:minor?guardianName:null,guardian_relation:minor?guardianRelation:null,
+         guardian_email:minor?guardianEmail:null,guardian_phone:minor?guardianPhone:null
+       }
+     });
+     if(writeError)return respond(500,{error:"Could not save enrollment draft"},origin);
+     return respond(created?.reused?200:201,{status:"draft",student_id:created.student_id,enrollment_id:created.enrollment_id,reused:created.reused,waiver_archived:false,payment_processed:false},origin);
+   }
    return respond(404,{error:"Not found"},origin);
  }catch{return respond(400,{error:"Invalid request"},origin)}
 });
