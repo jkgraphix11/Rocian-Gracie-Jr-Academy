@@ -30,3 +30,26 @@
 .method-kids h3{margin-bottom:0}.method-kids .method-source{justify-self:start}
 @media(max-width:900px){.method-kids{grid-template-columns:1fr 1fr}.method-kids .method-source{grid-column:2}}
 @media(max-width:640px){.method-principles{grid-template-columns:1fr;gap:0;margin-top:32px}.method-principle{padding:24px 0}.method-kids{grid-template-columns:1fr;gap:16px;padding:24px}.method-kids .method-source{grid-column:auto}}
+
+/* Instructor cards and full biographies */
+.instructors-section{padding-top:64px;margin-top:48px;border-top:1px solid #333}
+.instructors-heading{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:32px}
+.instructors-heading h2{font:700 clamp(30px,4vw,52px)/1.1 Archivo,Arial,sans-serif;letter-spacing:-.04em}
+.instructor-cards{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:24px}
+.instructor-card{grid-column:span 2;background:#111;border:1px solid #333;padding:28px;display:flex;flex-direction:column;align-items:flex-start}
+.instructor-card.has-bio{grid-column:span 3}
+.instructor-card h3{font-size:26px;font-weight:700;line-height:1.15;letter-spacing:-.03em;margin:0 0 12px}
+.instructor-role{font-size:14px;line-height:1.6;color:#b8b8b8;margin:0}
+.instructor-excerpt{font-size:16px;line-height:1.75;color:#b8b8b8;margin:24px 0;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.instructor-read{margin-top:auto;min-height:44px}
+.instructor-modal{position:fixed;inset:0;margin:auto;width:calc(100% - 32px);max-width:760px;max-height:calc(100dvh - 48px);overflow-y:auto;overscroll-behavior:contain;background:#111;color:#fff;border:1px solid #c7ff2e;padding:32px}
+.instructor-modal::backdrop{background:rgba(0,0,0,.8)}
+.instructor-modal-top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:24px}
+.instructor-modal-top .method-kicker{margin:0!important}
+.instructor-close{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;flex-shrink:0;border:1px solid #777}
+.instructor-close:hover{color:#c7ff2e;border-color:#c7ff2e}
+.instructor-close:focus-visible{outline:2px solid #c7ff2e;outline-offset:4px}
+.instructor-modal h2{font:700 clamp(28px,4vw,42px)/1.1 Archivo,Arial,sans-serif;letter-spacing:-.03em;margin:0 0 16px}
+.instructor-biography{margin-top:28px}
+.instructor-biography p{font-size:16px;line-height:1.8;color:#d0d0d0;margin:0 0 20px}
+@media(max-width:700px){.instructors-heading{align-items:flex-start;flex-direction:column}.instructor-cards{grid-template-columns:1fr}.instructor-card,.instructor-card.has-bio{grid-column:auto}.instructor-modal{padding:24px;max-height:calc(100dvh - 32px)}}

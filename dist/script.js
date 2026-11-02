@@ -194,3 +194,27 @@ window.initializeSite = function () {
   return () => { closeMenu(); listeners.abort(); document.body.style.overflow=''; };
 };
 window.rgjCleanup = window.initializeSite();
+
+/* Native dialogs provide focus containment and Escape support. */
+(() => {
+ document.querySelectorAll('[data-instructor-open]').forEach(button => {
+  const dialog=document.getElementById(button.dataset.instructorOpen);
+  if(!dialog)return;
+  let previousOverflow='';
+  button.addEventListener('click',()=>{
+   previousOverflow=document.body.style.overflow;
+   dialog.showModal();
+   document.body.style.overflow='hidden';
+  });
+  dialog.querySelector('[data-instructor-close]').addEventListener('click',()=>dialog.close());
+  dialog.addEventListener('click',event=>{
+   if(event.target!==dialog)return;
+   const r=dialog.getBoundingClientRect();
+   if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)dialog.close();
+  });
+  dialog.addEventListener('close',()=>{
+   document.body.style.overflow=previousOverflow;
+   button.focus({preventScroll:true});
+  });
+ });
+})();
