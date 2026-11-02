@@ -34,3 +34,16 @@ for path in output.rglob('*'):
     path.write_text(text)
 (output / '.nojekyll').touch()
 print('GitHub Pages artifact ready:', output)
+
+# Refresh cached CSS and JavaScript whenever their deployed contents change.
+import hashlib
+asset_versions = {
+    '/' + p.relative_to(output).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()[:12]
+    for p in output.rglob('*') if p.suffix in ('.css', '.js')
+}
+for page in output.rglob('*.html'):
+    html = page.read_text()
+    for asset, version in asset_versions.items():
+        url = base + asset
+        html = html.replace('"' + url + '"', '"' + url + '?v=' + version + '"')
+    page.write_text(html)
