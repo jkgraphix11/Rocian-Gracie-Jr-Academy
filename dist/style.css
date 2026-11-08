@@ -60,6 +60,7 @@
 #main .section-rule{font-family:var(--font-brand);font-size:12px;font-weight:600;line-height:1.6;letter-spacing:.12em;text-transform:uppercase;align-items:flex-start;gap:24px}
 #main .section-rule>span:first-child{color:#c7ff2e}
 #main .mat-access .section-rule>span:first-child{color:#000}
+#main .schedule-section .section-rule>span:first-child{color:#343434}
 #main .instructors-section{padding-top:0;padding-bottom:70px;margin-top:0;border-top:0}
 #main .faq-editorial>.section-rule{grid-column:1/-1;margin-bottom:0;padding-bottom:0}
 #main .faq-editorial{row-gap:36px}
