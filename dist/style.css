@@ -55,7 +55,7 @@
 @media(max-width:700px){.instructors-heading{align-items:flex-start;flex-direction:column}.instructor-cards{grid-template-columns:1fr}.instructor-card,.instructor-card.has-bio{grid-column:auto}.instructor-modal{padding:24px;max-height:calc(100dvh - 32px)}}
 
 /* Home section hierarchy: one eyebrow and one heading scale, below either language's H1. */
-#main{--home-section-size:clamp(28px,4vw,64px)}
+#main{--home-section-size:clamp(32px,4.7vw,76px)}
 #main .home-section-title{font-family:var(--font-brand);font-size:var(--home-section-size);font-weight:800;line-height:1.08;letter-spacing:-.04em;text-transform:uppercase}
 #main .section-rule{font-family:var(--font-brand);font-size:12px;font-weight:600;line-height:1.6;letter-spacing:.12em;text-transform:uppercase;align-items:flex-start;gap:24px}
 #main .section-rule>span:first-child{color:#c7ff2e}
@@ -64,4 +64,8 @@
 #main .instructors-section{padding-top:0;padding-bottom:70px;margin-top:0;border-top:0}
 #main .faq-editorial>.section-rule{grid-column:1/-1;margin-bottom:0;padding-bottom:0}
 #main .faq-editorial{row-gap:36px}
-@media(max-width:640px){#main{--home-section-size:7vw}#main .section-rule{font-size:10px;gap:16px}#main .section-rule>span:first-child{flex:1;min-width:0}#main .instructors-section{padding-bottom:55px}}
+@media(max-width:640px){#main{--home-section-size:8vw}#main .section-rule{font-size:10px;gap:16px}#main .section-rule>span:first-child{flex:1;min-width:0}#main .instructors-section{padding-bottom:55px}}
+
+/* Supporting schedule mantra follows the methodology's secondary type treatment. */
+#main .schedule-heading .schedule-mantra{font-family:var(--font-brand);font-size:clamp(20px,2.3vw,36px);font-weight:500;line-height:1.4;letter-spacing:-.02em;color:#343434;max-width:none;margin:24px 0 0}
+@media(max-width:640px){#main .schedule-heading .schedule-mantra{font-size:20px;margin-top:18px}}
