@@ -102,9 +102,107 @@ def home(lang):
 <section class="schedule-section px-gutter" id="schedule"><div class="section-rule"><span>04 / {t('HORARIO DE ENTRENAMIENTO','TRAINING SCHEDULE')}</span><span>TIJUANA {t('/ HORA LOCAL','/ LOCAL TIME')}</span></div><div class="schedule-heading"><div><h2 class="home-section-title">{t('HORARIOS','SCHEDULE')}</h2><p class="schedule-mantra">{t('LLEGA. ENTRENA. EVOLUCIONA.','SHOW UP. PUT IN WORK. EVOLVE.')}</p></div><p>{t('La constancia empieza con un horario.<br>Encuentra tu momento para entrenar.','Consistency starts with a schedule.<br>Find your time on the mat.')}</p></div><div class="schedule-filters" role="group" aria-label="{t('Filtrar horario','Filter schedule')}"><button type="button" data-schedule-filter="all" aria-pressed="true">{t('TODOS','ALL CLASSES')}</button><button type="button" data-schedule-filter="kids" aria-pressed="false">KIDS</button><button type="button" data-schedule-filter="adults" aria-pressed="false">{t('ADOLESCENTES / ADULTOS','TEENS / ADULTS')}</button><button type="button" data-schedule-filter="yoga" aria-pressed="false">YOGA</button><button type="button" data-schedule-filter="open" aria-pressed="false">OPEN MAT</button></div><label class="schedule-sort-mobile">{t('Ordenar por','Sort by')}<select id="schedule-sort" aria-label="{t('Ordenar horario','Sort schedule')}">{''.join(f'<option value="{i}-{direction}"{' selected' if i==2 and direction=='asc' else ''}>{label} · {t("Ascendente","Ascending") if direction=="asc" else t("Descendente","Descending")}</option>' for i,label in enumerate([t('Programa','Program'),t('Días','Days'),t('Horario','Time'),'Coach / Instructor']) for direction in ['asc','desc'])}</select></label><div class="schedule-table-wrap"><table class="schedule-table"><caption class="sr-only">{t('Horarios de clases, hora local de Tijuana','Class schedule, Tijuana local time')}</caption><thead><tr><th scope="col"><button type="button" data-schedule-sort="0">{t('PROGRAMA','PROGRAM')} <span aria-hidden="true" class="sort-indicator">↕</span></button></th><th scope="col"><button type="button" data-schedule-sort="1">{t('DÍAS','DAYS')} <span aria-hidden="true" class="sort-indicator">↕</span></button></th><th scope="col" aria-sort="ascending"><button type="button" data-schedule-sort="2">{t('HORARIO','TIME')} <span aria-hidden="true" class="sort-indicator">↑</span></button></th><th scope="col"><button type="button" data-schedule-sort="3">COACH / INSTRUCTOR <span aria-hidden="true" class="sort-indicator">↕</span></button></th></tr></thead><tbody>{schedule_rows(lang)}</tbody></table></div><p class="schedule-note">{t('Horario de la academia, hora local de Tijuana. Confirma tu grupo antes de asistir. Las horas sin rango indican únicamente el inicio de clase.','Academy schedule, Tijuana local time. Confirm your group before attending. Times without a range indicate class start only.')}</p><p id="schedule-status" class="sr-only" aria-live="polite"></p></section>
 <section class="trial-section px-gutter"><div class="trial-number" aria-hidden="true">03</div><div class="trial-content"><p class="mono-label">{t('DA EL PRIMER PASO','MAKE YOUR FIRST MOVE')}</p><h2 class="home-section-title">{t('CLASES DE PRUEBA.<br>SIN COSTO.','FREE CLASSES.<br>REAL EXPERIENCE.')}</h2><p>{t('Conoce la academia. Siente el entrenamiento.<br>Reserva tus 3 clases de prueba por WhatsApp.','Meet the academy. Experience the training.<br>Book your 3 free trial classes on WhatsApp.')}</p><a class="button trial-cta" href="{wa(lang)}" target="_blank" rel="noopener">{t('RESERVA TUS 3 CLASES','CLAIM YOUR 3 FREE CLASSES')} <span>↗</span></a></div><span class="trial-side" aria-hidden="true">STEP ON THE MAT.</span></section>
 <section class="enrollment-editorial px-gutter"><div class="section-rule"><span>04 / {t('DALE CONTINUIDAD','MAKE IT A PRACTICE')}</span><span>{t('TU SIGUIENTE PASO','YOUR NEXT STEP')}</span></div><a class="enrollment-link" href="{p}memberships/"><span class="mono-label">01</span><div><h2>{t('MEMBRESÍAS','MEMBERSHIPS')}</h2><p>{t('Haz del entrenamiento parte de tu vida. Consulta precios y opciones.','Make training part of your life. Explore pricing and options.')}</p></div><span class="big-arrow" aria-hidden="true">↗</span></a><a class="enrollment-link" href="{p}waiver/"><span class="mono-label">02</span><div><h2>{t('CARTA RESPONSIVA','STUDENT WAIVER')}</h2><p>{t('Prepárate antes de entrenar. Procesos para adultos y padres o tutores.','Get ready before you train. Adult and parent or guardian processes.')}</p></div><span class="big-arrow" aria-hidden="true">↗</span></a></section>
-<section class="faq-editorial px-gutter"><div class="section-rule"><span>06 / {t('PREGUNTAS FRECUENTES','FREQUENTLY ASKED QUESTIONS')}</span></div><div><h2 class="home-section-title">{t('SIN<br>DUDAS.','CLEAR<br>ANSWERS.')}</h2></div><div class="faq-list">'''
- faqs=[('¿Puedo empezar sin experiencia?','Can I start with no experience?','Sí. Escríbenos para conocer las opciones para principiantes y preparar tu primera visita.','Yes. Contact us to learn about beginner options and prepare for your first visit.'),('¿Qué debo llevar?','What should I bring?','Confirma con la academia la ropa y el equipo necesarios para la clase que vas a tomar.','Check with the academy about the clothing and equipment needed for your class.'),('¿Cómo reservo mis 3 clases de prueba?','How do I book my 3 free trial classes?','Escríbenos por WhatsApp al +52 664 368 6611 para coordinar tus clases y confirmar disponibilidad.','Message us on WhatsApp at +52 664 368 6611 to arrange your classes and confirm availability.'),('¿Cuánto cuestan las membresías?','How much do memberships cost?','Consulta los planes y precios en la sección de membresías.','See the membership section for plans and prices.'),('¿Cómo puedo conocer la academia?','How can I visit the academy?','Envíanos un mensaje para coordinar una visita a P.º Playas de Tijuana 3001a, Playas de Tijuana, Triangulode Oro, 22506 Tijuana, B.C.','Send us a message to arrange a visit to P.º Playas de Tijuana 3001a, Playas de Tijuana, Triangulode Oro, 22506 Tijuana, B.C.')]
- h+=''.join(f'<details><summary>{t(a,b)}<span aria-hidden="true">+</span></summary><p>{t(c,d)}</p></details>' for a,b,c,d in faqs)
+<section id="faqs" class="faq-editorial px-gutter" aria-labelledby="faq-heading"><div class="section-rule"><span>06 / {t('PREGUNTAS FRECUENTES','FREQUENTLY ASKED QUESTIONS')}</span></div><div><h2 id="faq-heading" class="home-section-title">{t('SIN<br>DUDAS.','CLEAR<br>ANSWERS.')}</h2><p class="faq-intro">{t('Lo que necesitas saber antes de empezar a entrenar en Playas de Tijuana.','What to know before you start training in Playas de Tijuana.')}</p></div><div class="faq-list">'''
+ faqs=[('¿Puedo empezar Jiu-Jitsu brasileño en Tijuana sin experiencia?',
+  'Can I start Brazilian Jiu-Jitsu in Tijuana with no experience?',
+  'Sí. No necesitas haber practicado artes marciales para dar el primer paso. En Rocian Gracie Jr. Tijuana, la '
+  'metodología organiza el aprendizaje desde los fundamentos y aumenta la complejidad conforme avanzas. Cuéntanos tu '
+  'edad y experiencia para ayudarte a elegir un grupo. <a href="#schedule" data-schedule-target="adults">Consulta los '
+  'horarios para adolescentes y adultos</a> y confirma tu primera visita con la academia.',
+  'Yes. You do not need a martial arts background to get started. At Rocian Gracie Jr. Tijuana, the teaching '
+  'methodology builds from fundamentals toward more complex techniques as you progress. Tell us your age and '
+  'experience so we can help you choose a group. <a href="#schedule" data-schedule-target="adults">View the teens’ and '
+  'adults’ schedule</a> and confirm your first visit with the academy.'),
+ ('¿Hay clases de Jiu-Jitsu para niños? ¿Desde qué edad?',
+  'Do you offer kids’ Jiu-Jitsu classes, and at what ages?',
+  'El horario incluye un grupo para pequeños de 2 a 4 años, además de grupos infantiles de principiantes, intermedios '
+  'y avanzados. Las actividades para niños y adolescentes se adaptan a la edad e incluyen técnica, respeto, '
+  'concentración y habilidades sociales. El grupo adecuado depende de la edad y experiencia de tu hijo; confirma su '
+  'asignación antes de asistir. <a href="#schedule" data-schedule-target="kids">Ver horarios infantiles</a>.',
+  'The schedule includes a toddler group for ages 2–4, plus beginner, intermediate, and advanced kids’ groups. '
+  'Age-adapted learning for children and teens combines technique with respect, focus, and social skills. The right '
+  'group depends on your child’s age and experience; confirm their placement before attending. <a href="#schedule" '
+  'data-schedule-target="kids">View the kids’ schedule</a>.'),
+ ('¿Cómo reservo las 3 clases de prueba gratis?',
+  'How do I book the 3 free trial classes?',
+  '<a href="{enroll}">Empieza aquí para conocer las clases de prueba</a> o escríbenos por WhatsApp al <a '
+  'href="{whatsapp}" target="_blank" rel="noopener">+52 664 368 6611</a>. Indica si entrenará un adulto o un niño, su '
+  'edad, experiencia y la disciplina que le interesa. La academia debe confirmar el grupo y las fechas; abrir el '
+  'formulario no reserva un lugar automáticamente.',
+  '<a href="{enroll}">Start here to explore the trial classes</a> or message us on WhatsApp at <a href="{whatsapp}" '
+  'target="_blank" rel="noopener">+52 664 368 6611</a>. Let us know whether the participant is an adult or child, '
+  'their age and experience, and which discipline interests them. The academy must confirm the group and dates; '
+  'opening the form does not automatically reserve a place.'),
+ ('¿Puedo tomar las 3 clases gratis más de una vez?',
+  'Can I take the 3 free classes more than once?',
+  'No. La promoción es una sola prueba de tres clases por persona, no una nueva prueba por cada inscripción, cuenta o '
+  'disciplina. La academia puede verificar nombre, fecha de nacimiento y datos de contacto para confirmar '
+  'elegibilidad. Si ya utilizaste tu prueba, <a href="#memberships">consulta las opciones de membresía</a> para '
+  'continuar entrenando.',
+  'No. The offer is one three-class trial per person, rather than a new trial for each registration, account, or '
+  'discipline. The academy may check your name, date of birth, and contact details to confirm eligibility. If you have '
+  'already used your trial, <a href="#memberships">explore membership options</a> to keep training.'),
+ ('¿Qué debo llevar a mi primera clase? ¿Necesito comprar un uniforme?',
+  'What should I bring to my first class? Do I need to buy a uniform?',
+  'Para tu primera visita, lleva agua y ropa deportiva cómoda para moverte. Antes de comprar equipo, pregunta a la '
+  'academia qué necesitas para la clase elegida: Jiu-Jitsu con Gi, No-Gi, Judo, Kickboxing, Box y Yoga tienen '
+  'requisitos distintos. Confirma también si necesitas llevar uniforme, rashguard, guantes u otro equipo desde la '
+  'primera sesión; pregunta si hay equipo de préstamo disponible.',
+  'For your first visit, bring water and comfortable athletic clothing you can move in. Before buying equipment, ask '
+  'the academy what your selected class requires: Gi Jiu-Jitsu, No-Gi, Judo, Kickboxing, Boxing, and Yoga have '
+  'different needs. Confirm whether you need a uniform, rashguard, gloves, or other equipment for your first session; '
+  'ask whether loan equipment is available.'),
+ ('¿Cuál es la diferencia entre Jiu-Jitsu con Gi y No-Gi?',
+  'What is the difference between Gi and No-Gi Jiu-Jitsu?',
+  'En Jiu-Jitsu con Gi se utiliza un uniforme de chaqueta y pantalón, y sus agarres forman parte del entrenamiento. En '
+  'No-Gi se entrena sin esa chaqueta, normalmente con ropa deportiva ajustada adecuada para la disciplina. Ambas '
+  'modalidades aparecen en nuestro horario. Si empiezas desde cero, consulta qué sesión y equipo corresponden a tu '
+  'grupo antes de asistir.',
+  'Gi Jiu-Jitsu uses a jacket-and-trousers uniform, and grips on that uniform are part of training. No-Gi is practiced '
+  'without that jacket, usually in fitted athletic clothing suited to the discipline. Both formats appear in our '
+  'schedule. If you are starting from scratch, ask which session and equipment are right for your group before '
+  'attending.'),
+ ('¿Qué disciplinas puedo practicar en la academia?',
+  'Which disciplines can I train at the academy?',
+  'La academia ofrece Jiu-Jitsu brasileño con Gi y No-Gi, Judo, Kickboxing, Box y Yoga. Las opciones varían según la '
+  'edad y el grupo. El selector de membresías muestra las artes marciales incluidas en cada opción; Yoga tiene su '
+  'propia categoría. <a href="#camino">Explora los programas</a> y revisa el horario para encontrar una clase que se '
+  'ajuste a ti.',
+  'The academy offers Brazilian Jiu-Jitsu in Gi and No-Gi, Judo, Kickboxing, Boxing, and Yoga. Options vary by age and '
+  'group. The membership selector shows the martial arts included in each option; Yoga has its own category. <a '
+  'href="#camino">Explore the programs</a> and check the schedule to find a class that fits you.'),
+ ('¿Dónde consulto los horarios de clases?',
+  'Where can I find the class schedule?',
+  '<a href="#schedule">Consulta el horario de entrenamiento</a> en esta página y filtra por niños, adolescentes y '
+  'adultos, Yoga u Open Mat. Todos los horarios corresponden a la hora local de Tijuana. Algunas entradas muestran '
+  'solamente la hora de inicio; confirma la duración, tu grupo y cualquier cambio con la academia antes de llegar.',
+  '<a href="#schedule">See the training schedule</a> on this page and filter by kids, teens and adults, Yoga, or Open '
+  'Mat. All times are local to Tijuana. Some entries show only the class start time; confirm the duration, your group, '
+  'and any changes with the academy before arriving.'),
+ ('¿Cuánto cuestan las membresías? ¿Hay opciones familiares?',
+  'How much are memberships? Are there family options?',
+  '<a href="#memberships">Usa el selector de membresías</a> para comparar opciones individuales y familiares, artes '
+  'marciales o Yoga, y frecuencia semanal. El resumen muestra el total en pesos mexicanos por mes y, en planes '
+  'familiares, el total del hogar. Antes de inscribirte, confirma con la academia el precio final, las disciplinas '
+  'incluidas y las condiciones del plan. Si solo estás de visita, el pase por clase anunciado es de $200 MXN; confirma '
+  'qué clases participan.',
+  '<a href="#memberships">Use the membership selector</a> to compare individual and family options, martial arts or '
+  'Yoga, and weekly attendance. The summary shows the monthly total in Mexican pesos and, for family plans, the '
+  'household total. Before enrolling, confirm the final price, included disciplines, and plan terms with the academy. '
+  'If you are just visiting, the advertised drop-in is $200 MXN; confirm which classes are eligible.'),
+ ('¿Dónde están ubicados y cómo coordino una visita?',
+  'Where are you located, and how do I arrange a visit?',
+  'Rocian Gracie Jr. Tijuana está en P.º Playas de Tijuana 3001a, Playas de Tijuana, Triangulode Oro, 22506 Tijuana, '
+  'B.C. <a href="#visitanos">Abre la sección de ubicación y contacto</a> para ver cómo llegar. Escríbenos por WhatsApp '
+  'al <a href="{whatsapp}" target="_blank" rel="noopener">+52 664 368 6611</a> para coordinar una visita o confirmar '
+  'tu primera clase antes de trasladarte.',
+  'Rocian Gracie Jr. Tijuana is at P.º Playas de Tijuana 3001a, Playas de Tijuana, Triangulode Oro, 22506 Tijuana, '
+  'B.C. <a href="#visitanos">Open location and contact</a> for directions. Message us on WhatsApp at <a '
+  'href="{whatsapp}" target="_blank" rel="noopener">+52 664 368 6611</a> to arrange a visit or confirm your first '
+  'class before traveling.')]
+ for index,(question_es,question_en,answer_es,answer_en) in enumerate(faqs):
+  answer=t(answer_es,answer_en).format(enroll=p+'enroll/',whatsapp=wa(lang))
+  h+=f'<details{" open" if index==0 else ""}><summary>{t(question_es,question_en)}<span aria-hidden="true">+</span></summary><p>{answer}</p></details>'
  h+=f'''</div></section><section class="mat-access px-gutter" id="visitanos"><div id="contacto"></div><div class="section-rule"><span>07 / {t('UBICACIÓN Y CONTACTO','LOCATION AND CONTACT')}</span><span>{t('NOS VEMOS EN PLAYAS','SEE YOU IN PLAYAS')}</span></div><div class="access-grid"><div><h2 class="home-section-title">{t('NOS VEMOS<br>EN EL TATAMI.','SEE YOU<br>ON THE MAT.')}</h2><a class="access-phone" href="{wa(lang)}" target="_blank" rel="noopener">+52 664 368 6611 <span>↗</span></a></div><div class="location-card"><span class="map-cross" aria-hidden="true">+</span><p class="mono-label">PLAYAS DE TIJUANA / MX</p><h3>P.º PLAYAS<br>DE TIJUANA<br><span>3001a</span></h3><address>P.º Playas de Tijuana 3001a, Playas de Tijuana, Triangulode Oro, 22506 Tijuana, B.C.</address><a href="https://maps.app.goo.gl/rPpmxRjLXz66ve6u9" target="_blank" rel="noopener">{t('CÓMO LLEGAR','GET DIRECTIONS')} ↗</a></div></div><div class="access-bottom"><span>{t('TÉCNICA. DISCIPLINA. EVOLUCIÓN.','TECHNIQUE. DISCIPLINE. GROWTH.')}</span><a href="https://rociangracie.com.br/" target="_blank" rel="noopener">{t('EXPLORA NUESTRO LEGADO','EXPLORE OUR LEGACY')} ↗</a></div></section></main>'''+footer(lang)
  h=re.sub(r'<section class="enrollment-editorial.*?</section>',lambda m:membership_section(lang),h,flags=re.S)
  return h

@@ -102,3 +102,12 @@ html{--site-header-height:94px;scroll-padding-top:var(--site-header-height)}
  html{scroll-behavior:auto}
  .motion-pending,.motion-enter{opacity:1;translate:none;scale:none;animation:none!important}
 }
+
+/* Readable, locally relevant student FAQs. */
+.faq-editorial .faq-intro{font-size:16px;line-height:1.75;color:#bdbdbd;max-width:34ch;margin-top:24px}
+.faq-list summary{font-size:18px;font-weight:600;line-height:1.5;padding:24px 0;gap:24px;min-height:64px}
+.faq-list summary>span{flex-shrink:0}
+.faq-list details>p{font-size:16px;line-height:1.8;color:#c4c4c4;max-width:68ch;padding-bottom:28px}
+.faq-list a{color:#c7ff2e;text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1px}
+.faq-list a:hover{color:#fff}
+@media(max-width:640px){.faq-list summary{font-size:17px;padding:22px 0}.faq-list details>p,.faq-editorial .faq-intro{font-size:16px}}
