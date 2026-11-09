@@ -143,7 +143,7 @@ window.initializeSite = function () {
       toggle.setAttribute('aria-expanded', 'false');
       toggle.focus();
     });
-    window.addEventListener('resize', () => { if (window.innerWidth > 960) closeMenu(); }, {signal:listeners.signal});
+    window.addEventListener('resize', () => { if (window.innerWidth > 1279) closeMenu(); }, {signal:listeners.signal});
   }
   document.querySelectorAll('[data-language]').forEach(a => {
     if (location.hash && !window.RGJ_STANDALONE) a.href += location.hash;
