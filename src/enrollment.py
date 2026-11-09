@@ -10,5 +10,5 @@ def enrollment(lang, route='enroll/'):
  content=content.replace('</head>','<link rel="stylesheet" href="/enrollment.css"></head>')
  content+=f'''<main id="main" class="enroll-main px-gutter"><section class="enroll-heading"><p class="eyebrow">RGJ / {('STUDENT WAIVER' if en else 'CARTA RESPONSIVA') if waiver_only else ('NEW STUDENT ENROLLMENT' if en else 'INSCRIPCIÓN DE NUEVOS ALUMNOS')}</p><h1>{title}</h1><p>{desc}</p></section><div id="enrollment-app" data-waiver-only="{str(waiver_only).lower()}"></div><noscript>JavaScript is required for student enrollment. Contact the academy on WhatsApp: +52 664 368 6611.</noscript></main>'''
  content+=footer(lang)
- content=content.replace('<script src="/script.js"></script>','<script src="/script.js"></script><script src="/waiver-content.js"></script><script src="/enrollment.js"></script>')
+ content=content.replace('<script src="/script.js"></script>','<script src="/script.js"></script><script src="/waiver-content.js"></script><script src="/auth-staging.js"></script><script src="/enrollment.js"></script>')
  return content
