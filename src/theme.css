@@ -220,3 +220,6 @@ html[lang=es] .hero-title-wrap h1{font-size:clamp(40px,4.9vw,78px)}
 @media(max-width:1000px){.planner-right{grid-template-rows:auto auto}.planner-right .planner-summary .planner-select{margin-top:0}}
 
 #main .trial-section{border-bottom:0}
+
+/* Match the summary border to the fieldset border beneath its centered legend. */
+@media(min-width:1001px){.planner-steps>fieldset>legend{line-height:24px}.planner-right{margin-top:12px}}
