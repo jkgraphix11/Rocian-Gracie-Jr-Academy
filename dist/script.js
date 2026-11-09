@@ -30,10 +30,98 @@ window.initPlanFinder=function(){
  }
  root.onchange=e=>{if(!e.target.matches('input[type=radio]'))return;const q=query();q.set(e.target.name,e.target.value);state=window.RGJQuote(q);render(e.target.name);};render();
 };
+/* Lightweight, one-time entrances. Content remains visible without JavaScript. */
+window.initSiteMotion = function () {
+ const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+ if (media.matches || !('IntersectionObserver' in window)) return () => {};
+ const nodes = new Set();
+ let observer;
+ const show = (element, animate = true) => {
+  element.classList.remove('motion-pending');
+  if (animate) element.classList.add('motion-enter');
+  observer?.unobserve(element);
+ };
+ const stop = () => {
+  observer?.disconnect();
+  nodes.forEach(element => {
+   element.classList.remove('motion-pending', 'motion-enter', 'motion-bloom');
+   element.style.removeProperty('--reveal-delay');
+   element.style.removeProperty('--reveal-duration');
+  });
+ };
+ const focus = event => {
+  const element = event.target.closest('.motion-pending');
+  if (element) show(element, false);
+ };
+ const change = () => { if (media.matches) stop(); };
+ try {
+  observer = new IntersectionObserver(entries => {
+   entries.forEach(entry => { if (entry.isIntersecting) show(entry.target); });
+  }, {threshold: 0.06, rootMargin: '0px 0px -24px 0px'});
+  const prepare = (element, delay = 0, duration = 850, bloom = false) => {
+   if (!element || nodes.has(element)) return;
+   // Never hide content above the current anchor or scroll restoration position.
+   if (element.getBoundingClientRect().bottom <= 0) return;
+   nodes.add(element);
+   element.style.setProperty('--reveal-delay', delay + 'ms');
+   element.style.setProperty('--reveal-duration', duration + 'ms');
+   if (bloom) element.classList.add('motion-bloom');
+   element.classList.add('motion-pending');
+   return element;
+  };
+  const hero = document.querySelector('.hero-editorial');
+  if (hero && hero.getBoundingClientRect().bottom > 0) {
+   // Preserve the editorial layout: eyebrow, headline, portrait, copy, then CTA.
+   const sequence = [
+    ['.kicker', 0, 800], ['h1', 150, 900], ['.hero-portrait', 200, 1200, true],
+    ['.hero-foot', 300, 900], ['.mat-stamp', 350, 900], ['.trial-ticket', 450, 1000]
+   ];
+   sequence.forEach(([selector, delay, duration, bloom]) => {
+    const element = prepare(hero.querySelector(selector), delay, duration, bloom);
+    if (element) show(element);
+   });
+  }
+  const selectors = [
+   '#main .section-rule', '#main .home-section-title', '.method-mantra', '.method-copy',
+   '.method-principle', '.method-kids', '.instructor-card', '.instructors-heading>.method-source',
+   '.program-heading>p', '.program-row', '.schedule-mantra', '.schedule-heading>p',
+   '.schedule-filters', '.schedule-table-wrap', '.schedule-note', '.trial-number', '.trial-content',
+   '.membership-heading>p', '.planner-steps>fieldset', '.planner-right>.planner-summary',
+   '.planner-right>.membership-actions', '.faq-list>details', '.access-phone', '.location-card',
+   '.access-bottom', '.inner-hero', '.enroll-heading', '.site-footer'
+  ].join(',');
+  const candidates = [...document.querySelectorAll(selectors)];
+  const groups = new Map();
+  candidates.forEach(element => {
+   // Animate a content group OR its children, never both at the same time.
+   if (candidates.some(parent => parent !== element && parent.contains(element))) return;
+   const group = element.closest('.instructor-cards,.method-principles,.program-list,.faq-list,.planner-steps');
+   let delay = element.matches('.home-section-title') ? 90 : 0;
+   if (group) {
+    const index = groups.get(group) || 0;
+    groups.set(group, index + 1);
+    delay = Math.min(index * 75, 225);
+   }
+   const prepared = prepare(element, delay);
+   if (prepared) observer.observe(prepared);
+  });
+  document.addEventListener('focusin', focus);
+  media.addEventListener('change', change);
+ } catch {
+  stop(); // Unsupported APIs must never leave text or controls invisible.
+ }
+ return () => {
+  stop();
+  document.removeEventListener('focusin', focus);
+  media.removeEventListener('change', change);
+ };
+};
+
 window.initializeSite = function () {
   'use strict';
   const listeners = new AbortController();
   window.initPlanFinder();
+  const cleanupMotion = window.initSiteMotion();
   const en = document.documentElement.lang === 'en';
   const lang = en ? 'en' : 'es';
   const toggle = document.querySelector('.menu-toggle');
@@ -191,7 +279,7 @@ window.initializeSite = function () {
     const button=[...document.querySelectorAll('[data-schedule-filter]')].find(b=>b.dataset.scheduleFilter===link.dataset.scheduleTarget);
     if(button){button.click();button.focus({preventScroll:true});}
   }, {signal:listeners.signal}));
-  return () => { closeMenu(); listeners.abort(); document.body.style.overflow=''; };
+  return () => { cleanupMotion(); closeMenu(); listeners.abort(); document.body.style.overflow=''; };
 };
 window.rgjCleanup = window.initializeSite();
 
