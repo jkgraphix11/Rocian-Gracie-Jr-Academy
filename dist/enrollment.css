@@ -16,7 +16,7 @@
 #enrollment-app .enroll-form .phone-input{display:flex;align-items:center;background:#18191c;border:1px solid #45464c;border-radius:8px;min-width:0;transition:border-color .15s,box-shadow .15s}
 #enrollment-app .enroll-form .phone-input:hover{border-color:#757680}
 #enrollment-app .enroll-form .phone-input:focus-within{border-color:#c7ff2e;box-shadow:0 0 0 3px #c7ff2e30}
-#enrollment-app .enroll-form .phone-input .phone-country{width:76px;flex:0 0 76px;min-width:0;border:0;background:transparent;color:#d0d0d5;border-radius:8px 0 0 8px;padding:11px 10px;font:400 16px/24px Archivo,sans-serif;min-height:48px;color-scheme:dark;box-shadow:none;outline:none}
+#enrollment-app .enroll-form .phone-input .phone-country{width:60px;flex:0 0 60px;min-width:0;border:0;background:transparent;color:#d0d0d5;border-radius:8px 0 0 8px;padding:11px 10px;font:400 16px/24px Archivo,sans-serif;min-height:48px;color-scheme:dark;box-shadow:none;outline:none}
 #enrollment-app .phone-country option{background:#18191c;color:#f5f5f6}
 #enrollment-app .enroll-form .phone-input input{width:0;flex:1;min-width:0;border:0;border-radius:0 8px 8px 0;box-shadow:none;background:transparent;padding-left:8px;outline:none}
 #enrollment-app .enroll-form .phone-input input:focus{border:0;box-shadow:none;outline:none}
