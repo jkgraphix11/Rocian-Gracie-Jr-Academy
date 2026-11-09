@@ -223,3 +223,8 @@ html[lang=es] .hero-title-wrap h1{font-size:clamp(40px,4.9vw,78px)}
 
 /* Match the summary border to the fieldset border beneath its centered legend. */
 @media(min-width:1001px){.planner-steps>fieldset>legend{line-height:24px}.planner-right{margin-top:12px}}
+
+/* Use one header offset for menu anchors; margins must not add it a second time. */
+html{--site-header-height:94px;scroll-padding-top:var(--site-header-height)}
+#main section[id]{scroll-margin-top:0}
+@media(max-width:960px){html{--site-header-height:80px}}
