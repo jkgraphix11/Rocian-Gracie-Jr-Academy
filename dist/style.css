@@ -57,7 +57,7 @@
 /* Home section hierarchy: one eyebrow and one heading scale, below either language's H1. */
 #main{--home-section-size:clamp(32px,4.7vw,76px)}
 #main .home-section-title{max-width:800px;font-family:var(--font-brand);font-size:var(--home-section-size);font-weight:800;line-height:1.08;letter-spacing:-.04em;text-transform:uppercase}
-#main .section-rule{font-family:var(--font-brand);font-size:12px;font-weight:600;line-height:1.6;letter-spacing:.12em;text-transform:uppercase;align-items:flex-start;gap:24px}
+#main .section-rule{border:0;font-family:var(--font-brand);font-size:12px;font-weight:600;line-height:1.6;letter-spacing:.12em;text-transform:uppercase;align-items:flex-start;gap:24px}
 #main .section-rule>span:first-child{color:#c7ff2e}
 #main .mat-access .section-rule>span:first-child{color:#000}
 #main .schedule-section .section-rule>span:first-child{color:#343434}
