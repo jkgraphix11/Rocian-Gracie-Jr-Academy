@@ -38,8 +38,8 @@ def brand(prefix):
  return f'<a class="brand" href="{prefix}" aria-label="Rocian Gracie Jr Tijuana"><img src="/assets/logo.png" alt="" width="60" height="56"><span>ROCIAN GRACIE JR<small>TIJUANA / JIU JITSU</small></span></a>'
 def header(lang,page):
  en=lang=='en';p='/en/' if en else '/';other=('/' if en else '/en/')+page
- labels=['Home','Programs','Schedule','Memberships','Contact'] if en else ['Inicio','Programas','Horarios','Membresías','Contacto']
- urls=[p,p+'#camino',p+'#schedule',p+'#memberships',p+'#visitanos']
+ labels=['Home','Instructors','Programs','Schedule','Memberships','Contact'] if en else ['Inicio','Instructores','Programas','Horarios','Membresías','Contacto']
+ urls=[p,p+'#instructors',p+'#camino',p+'#schedule',p+'#memberships',p+'#visitanos']
  nav=''.join(f'<a href="{u}"'+(' aria-current="page"' if page and u==p+page else '')+f'>{l}</a>' for u,l in zip(urls,labels))
  close='Close' if en else 'Cerrar';code='ES' if en else 'EN'
  switch=f'<a class="lang-switch" data-language="{"es" if en else "en"}" href="{other}" lang="{"es" if en else "en"}" hreflang="{"es" if en else "en"}" aria-label="{"Cambiar a español" if en else "Switch to English"}"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><path d="M3 12h18"/></svg>{code}</a>'

@@ -265,3 +265,5 @@ html{--site-header-height:94px;scroll-padding-top:var(--site-header-height)}
  .menu-toggle span{display:block;height:1px;background:#fff;width:24px}
  .header-actions{margin-left:auto}
 }
+
+@media(min-width:1280px) and (max-width:1399px){#desktop-nav{gap:18px}}
