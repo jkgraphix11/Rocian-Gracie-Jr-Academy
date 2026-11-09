@@ -209,3 +209,12 @@ html[lang=es] .hero-title-wrap h1{font-size:clamp(40px,4.9vw,78px)}
 /* Supporting schedule mantra follows the methodology's secondary type treatment. */
 #main .schedule-heading .schedule-mantra{font-family:var(--font-brand);font-size:clamp(20px,2.3vw,36px);font-weight:500;line-height:1.4;letter-spacing:-.02em;color:#343434;max-width:none;margin:24px 0 0}
 @media(max-width:640px){#main .schedule-heading .schedule-mantra{font-size:20px;margin-top:18px}}
+
+/* Membership cards share the selector height and scroll with the page. */
+.planner-layout{align-items:stretch}
+.planner-steps>fieldset:last-child{margin-bottom:0}
+.planner-right{position:static;top:auto;max-height:none;overflow:visible;align-self:stretch;display:grid;grid-template-rows:minmax(min-content,2fr) minmax(min-content,1fr);gap:24px}
+.planner-right .planner-summary{align-self:stretch;display:flex;flex-direction:column}
+.planner-right .planner-summary .planner-select{margin-top:auto}
+.planner-right .membership-actions{margin-top:0;justify-content:space-between}
+@media(max-width:1000px){.planner-right{grid-template-rows:auto auto}.planner-right .planner-summary .planner-select{margin-top:0}}
