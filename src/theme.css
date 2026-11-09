@@ -283,3 +283,5 @@ html{--site-header-height:94px;scroll-padding-top:var(--site-header-height)}
 .mobile-menu[open] .mobile-menu-close .menu-glyph path:first-child{animation:menuCloseTop .22s cubic-bezier(.16,1,.3,1) both}
 .mobile-menu[open] .mobile-menu-close .menu-glyph path:last-child{animation:menuCloseBottom .22s cubic-bezier(.16,1,.3,1) both}
 @media(prefers-reduced-motion:reduce){.menu-glyph path{transition:none!important;animation:none!important}}
+
+.down-link{place-items:center}.down-link>.icon{margin:0}
