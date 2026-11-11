@@ -54,3 +54,28 @@ assert(script.includes('language:lang,interfaceLanguage:lang'));
 const waiverStep=script.split('if(step===3)return')[1].split('if(step===4)return')[0];
 assert.equal((waiverStep.match(/\$\{check\(/g)||[]).length,2);
 console.log('PASS: two acknowledgements, bilingual waiver bodies, no paper blanks, and language-specific evidence hashes.');
+
+const {enrollmentFlow,emergencyContact}=sandbox.window.RGJEnrollment;
+// A minor can proceed straight to the waiver using the guardian's current details.
+const child={dob:'2016-04-15',guardianName:'Ana Pérez',guardianRelation:'Mother',guardianPhone:'+526641234567'};
+assert.deepEqual(Array.from(enrollmentFlow(false,child)),[0,1,3,4,5]);
+assert.deepEqual(Array.from(enrollmentFlow(true,child)),[1,3,5]);
+assert.deepEqual(JSON.parse(JSON.stringify(emergencyContact(child))),{name:'Ana Pérez',relationship:'Mother',phone:'+526641234567'});
+// Back/Next use the same route; changed guardian details must never leave a stale contact.
+const minorFlow=Array.from(enrollmentFlow(false,child));
+assert.equal(minorFlow[minorFlow.indexOf(3)-1],1);
+const editedChild={...child,guardianName:'Luis Pérez',guardianRelation:'Father',guardianPhone:'+16195550123'};
+assert.deepEqual(JSON.parse(JSON.stringify(emergencyContact(editedChild))),{name:'Luis Pérez',relationship:'Father',phone:'+16195550123'});
+// Opting out preserves a separate contact; opting back in uses the guardian again.
+const separateContact={...child,useGuardianEmergency:false,emergencyName:'Elena Pérez',emergencyRelation:'Aunt',emergencyPhone:'+526649876543'};
+assert.deepEqual(Array.from(enrollmentFlow(false,separateContact)),[0,1,2,3,4,5]);
+assert.deepEqual(Array.from(enrollmentFlow(true,separateContact)),[1,2,3,5]);
+assert.equal(emergencyContact(separateContact).name,'Elena Pérez');
+assert.equal(emergencyContact({...separateContact,useGuardianEmergency:true}).name,'Ana Pérez');
+// Correcting a DOB to adult must restore the emergency-contact step, even with guardian data present.
+const adult={...separateContact,dob:'1990-04-15',useGuardianEmergency:true};
+assert.deepEqual(Array.from(enrollmentFlow(false,adult)),[0,1,2,3,4,5]);
+assert.deepEqual(Array.from(enrollmentFlow(true,adult)),[1,2,3,5]);
+assert.equal(emergencyContact(adult).name,'Elena Pérez');
+for(const dob of ['', 'invalid', '2030-01-01'])assert(enrollmentFlow(false,{...child,dob}).includes(2));
+console.log('PASS: minor contact reuse, both enrollment routes, Back navigation, guardian edits, opt-out, and DOB corrections.');
